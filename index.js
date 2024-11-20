@@ -1,6 +1,6 @@
 // Access to Environmental Variables
 import dotenv from "dotenv";
-dotenv.config();
+dotenv.config({ path: "./.env.local" });
 
 // Import Dependencies
 import express from "express";
@@ -11,12 +11,13 @@ import { Server } from "socket.io";
 
 // Setup Server
 const PORT = 8000;
-const Frontend_URL = process.env.FRONTEND_URL;
+const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
 const expressServer = express();
+console.log(FRONTEND_URL);
 
 // CORS Middleware
 const corsOptions = {
-  origin: Frontend_URL,
+  origin: FRONTEND_URL,
   credentials: true,
 };
 expressServer.use(cors(corsOptions));
@@ -30,7 +31,7 @@ expressServer.use(express.urlencoded({ extended: true }));
 const server = createServer(expressServer);
 const io = new Server(server, {
   cors: {
-    origin: Frontend_URL,
+    origin: FRONTEND_URL,
     credentials: true,
     methods: ["GET", "POST"],
   },
