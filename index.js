@@ -4,10 +4,15 @@ dotenv.config({ path: "./.env.local" });
 
 // Import Dependencies
 import express from "express";
+import mongoose from "mongoose";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import { createServer } from "node:http";
 import { Server } from "socket.io";
+import User from "./models/usersModel.js";
+
+// Import Routes
+import userRoute from "./routes/userRoute.js";
 
 // Setup Server
 const PORT = 8000;
@@ -55,10 +60,36 @@ io.on("connection", (socket) => {
   });
 });
 
+// MongoDB Connection
+const MONGODB_URI = process.env.MONGODB_URI;
+mongoose
+  .connect(MONGODB_URI)
+  .then(() => {
+    console.log("Connected to MongoDB");
+  })
+  .catch((err) => {
+    console.log("Error connecting to MongoDB:", err);
+  });
+
 // Routes
+expressServer.get("/testMongoDB", async (req, res) => {
+  console.log("testMongoDB");
+  try {
+    const data = await User.findOne({ name: "Justin" });
+    console.log(data);
+    res.status(200).json(data);
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+// Routes
+expressServer.use("/user", userRoute);
+
+// Test
 expressServer.get("/test", (req, res) => res.send("Hello World Test"));
 expressServer.get("/", (req, res) => res.send("Hello World"));
-expressServer.get("*", (req, res) =>
+expressServer.get("*", (req, res, next) =>
   next({
     log: "Express error handler caught unknown endpoint",
     status: 404,
