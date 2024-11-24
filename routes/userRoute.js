@@ -1,9 +1,10 @@
 import express from "express";
 import userController from "../controllers/userController.js";
 import tokenController from "../controllers/tokenController.js";
+import dataController from "../controllers/dataController.js";
 const router = express.Router();
 
-// Check if user email exists
+// Check if User Email Exists
 router.post(
   "/userExists",
   userController.checkUserExists,
@@ -26,6 +27,14 @@ router.post(
   userController.checkUserExists,
   userController.verifyUser,
   tokenController.issueToken,
+  (req, res) => res.status(200).json(res.locals.result)
+);
+
+// User Chat Data
+router.post(
+  "/getChatData",
+  dataController.fetchUserFriends,
+  dataController.fetchUserChats,
   (req, res) => res.status(200).json(res.locals.result)
 );
 

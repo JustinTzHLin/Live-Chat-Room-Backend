@@ -5,6 +5,7 @@ import User from "../models/usersModel.js";
 const SALT_WORK_FACTOR = 10;
 const userController = {};
 
+/* check if user exists in database */
 userController.checkUserExists = async (req, res, next) => {
   try {
     const user = await User.exists({ email: req.body.email });
@@ -20,6 +21,7 @@ userController.checkUserExists = async (req, res, next) => {
   }
 };
 
+/* send registration email */
 userController.sendRegistrationEmail = async (req, res, next) => {
   if (res.locals.result.userExists) return next();
   const { JWT_SECRET, FRONTEND_URL, SMTP_EMAIL } = process.env;
@@ -56,6 +58,7 @@ userController.sendRegistrationEmail = async (req, res, next) => {
   }
 };
 
+/* create new user */
 userController.createUser = async (req, res, next) => {
   if (res.locals.result.userExists) {
     res.locals.skipIssueToken = true;
@@ -84,6 +87,7 @@ userController.createUser = async (req, res, next) => {
   }
 };
 
+/* verify user login */
 userController.verifyUser = async (req, res, next) => {
   if (!res.locals.result.userExists) {
     res.locals.skipIssueToken = true;
