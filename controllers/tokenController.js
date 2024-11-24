@@ -56,7 +56,7 @@ tokenController.issueToken = async (req, res, next) => {
     // Store the token in HTTP-only cookie
     res.cookie("just.in.chat.user", loggedInToken, {
       secure: true,
-      sameSite: "none",
+      sameSite: "lax",
       expires: new Date(Date.now() + 60 * 60 * 1000),
     });
   } catch (err) {
