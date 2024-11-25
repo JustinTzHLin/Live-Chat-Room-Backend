@@ -36,9 +36,7 @@ dataController.fetchUserFriends = async (req, res, next) => {
 dataController.fetchUserChats = async (req, res, next) => {
   if (res.locals.skipfetchUserChats) return next();
   const { userId } = req.body;
-  const userObjectId = mongoose.Types.ObjectId.createFromHexString(
-    userId.toString()
-  );
+  const userObjectId = mongoose.Types.ObjectId.createFromHexString(userId);
   console.log(userObjectId);
   try {
     const conversations = await Conversation.find({

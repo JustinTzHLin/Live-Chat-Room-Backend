@@ -57,7 +57,7 @@ tokenController.issueToken = async (req, res, next) => {
     res.cookie("just.in.chat.user", loggedInToken, {
       secure: true,
       sameSite: "lax",
-      expires: new Date(Date.now() + 60 * 60 * 1000),
+      maxAge: 60 * 60 * 1000,
     });
   } catch (err) {
     return next({
