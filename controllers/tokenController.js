@@ -58,7 +58,6 @@ tokenController.issueToken = async (req, res, next) => {
       httpOnly: true,
       secure: true,
       sameSite: "none",
-      path: "/",
       maxAge: 60 * 60 * 1000,
     });
   } catch (err) {
