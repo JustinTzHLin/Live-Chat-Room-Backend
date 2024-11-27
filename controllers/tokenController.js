@@ -57,7 +57,7 @@ tokenController.issueToken = async (req, res, next) => {
     res.cookie("just.in.chat.user", loggedInToken, {
       httpOnly: true,
       secure: true,
-      sameSite: "",
+      sameSite: "none",
       path: "/",
       maxAge: 60 * 60 * 1000,
     });
