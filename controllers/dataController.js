@@ -14,7 +14,11 @@ dataController.fetchUserFriends = async (req, res, next) => {
       for (const friendId of user.contacts) {
         const friend = await User.findById(friendId);
         if (friend) {
-          const friendInfo = { email: friend.email, username: friend.username };
+          const friendInfo = {
+            email: friend.email,
+            username: friend.username,
+            friendId: friend._id,
+          };
           res.locals.result.friends.push(friendInfo);
         }
       }
@@ -61,6 +65,9 @@ dataController.fetchUserChats = async (req, res, next) => {
           isTransient: message.isTransient,
         });
       }
+      res.locals.result.conversations
+        .at(-1)
+        .messages.sort((a, b) => a.timestamp - b.timestamp);
     }
     return next();
   } catch (err) {
