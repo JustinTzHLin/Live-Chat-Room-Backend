@@ -46,28 +46,30 @@ dataController.fetchUserChats = async (req, res, next) => {
     const conversations = await Conversation.find({
       participantIDs: userObjectId,
     });
-    res.locals.result.conversations = [];
+    res.locals.result.conversations = {};
     for (const conversation of conversations) {
-      res.locals.result.conversations.push({
+      res.locals.result.conversations[conversation._id] = {
         type: conversation.type,
         roomName: conversation.roomName,
         participantIDs: conversation.participantIDs,
         messages: [],
-      });
+        conversationId: conversation._id,
+      };
       const messages = await Message.find({ conversationId: conversation._id });
       for (const message of messages) {
-        res.locals.result.conversations.at(-1).messages.push({
+        res.locals.result.conversations[message.conversationId].messages.push({
           senderId: message.senderId,
           content: message.content,
           timestamp: message.timestamp,
           readBy: message.readBy,
           status: message.status,
-          isTransient: message.isTransient,
+          // isTransient: message.isTransient,
+          conversationId: message.conversationId,
         });
       }
-      res.locals.result.conversations
-        .at(-1)
-        .messages.sort((a, b) => a.timestamp - b.timestamp);
+      res.locals.result.conversations[conversation._id].messages.sort(
+        (a, b) => a.timestamp - b.timestamp
+      );
     }
     return next();
   } catch (err) {

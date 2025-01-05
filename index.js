@@ -14,6 +14,7 @@ import User from "./models/usersModel.js";
 // Import Routes
 import userRoute from "./routes/userRoute.js";
 import tokenRoute from "./routes/tokenRoute.js";
+import chatRoute from "./routes/chatRoute.js";
 
 // Setup Server
 const PORT = 8000;
@@ -87,9 +88,9 @@ expressServer.get("/testMongoDB", async (req, res) => {
 // Routes
 expressServer.use("/user", userRoute);
 expressServer.use("/token", tokenRoute);
+expressServer.use("/chat", chatRoute);
 
 // Test
-expressServer.get("/test", (req, res) => res.send("Hello World Test"));
 expressServer.get("/", (req, res) => res.send("Hello World"));
 expressServer.get("*", (req, res, next) =>
   next({
