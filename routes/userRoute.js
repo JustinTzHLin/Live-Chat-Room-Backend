@@ -6,8 +6,8 @@ const router = express.Router();
 
 // Check if User Email Exists
 router.post(
-  "/userExists",
-  userController.checkUserExists,
+  "/registerCheck",
+  userController.checkUserEmailExists,
   userController.sendRegistrationEmail,
   (req, res) => res.status(200).json(res.locals.result)
 );
@@ -15,7 +15,7 @@ router.post(
 // User Register
 router.post(
   "/signUp",
-  userController.checkUserExists,
+  userController.checkUserEmailExists,
   userController.createUser,
   tokenController.issueToken,
   (req, res) => res.status(200).json(res.locals.result)
@@ -24,7 +24,7 @@ router.post(
 // User Login
 router.post(
   "/signIn",
-  userController.checkUserExists,
+  userController.checkUserEmailExists,
   userController.verifyUser,
   tokenController.issueToken,
   (req, res) => res.status(200).json(res.locals.result)
@@ -35,6 +35,22 @@ router.post(
   "/getChatData",
   dataController.fetchUserFriends,
   dataController.fetchUserChats,
+  (req, res) => res.status(200).json(res.locals.result)
+);
+
+// Search User
+router.post(
+  "/searchUser",
+  tokenController.verifyLoggedInToken,
+  userController.searchUser,
+  (req, res) => res.status(200).json(res.locals.result)
+);
+
+// Send Friend Request
+router.post(
+  "/sendFriendRequest",
+  tokenController.verifyLoggedInToken,
+  userController.sendFriendRequest,
   (req, res) => res.status(200).json(res.locals.result)
 );
 
