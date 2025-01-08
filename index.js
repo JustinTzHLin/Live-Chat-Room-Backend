@@ -52,8 +52,32 @@ io.on("connection", (socket) => {
   socket.on("send_message", (message) => {
     console.log("Message received:", message);
 
-    // Send message to all clients, including the one that sent the message
+    // Send message to all clients, including the sender
     io.emit("receive_message", message);
+  });
+
+  // Handle sent friend request
+  socket.on("send_friend_request", (friendRequest) => {
+    console.log("Friend request received:", friendRequest);
+
+    // Send friend request to all clients, including the sender
+    io.emit("receive_friend_request", friendRequest);
+  });
+
+  // Handle rejected or canceld friend request
+  socket.on("cancel_reject_friend_request", (friendRequest) => {
+    console.log("Friend request canceled or rejected:", friendRequest);
+
+    // Cancel or reject friend request from all clients, including the canceler or rejecter
+    io.emit("canceled_rejected_friend_request", friendRequest);
+  });
+
+  // Handle accepted friend request
+  socket.on("accept_friend_request", (friendRequest) => {
+    console.log("Friend request accepted:", friendRequest);
+
+    // Accept friend request from all clients, including the accepter
+    io.emit("accepted_friend_request", friendRequest);
   });
 
   // Handle disconnections

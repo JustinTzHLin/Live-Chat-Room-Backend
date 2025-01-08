@@ -2,6 +2,7 @@ import express from "express";
 import userController from "../controllers/userController.js";
 import tokenController from "../controllers/tokenController.js";
 import dataController from "../controllers/dataController.js";
+import friendRequestController from "../controllers/friendRequestController.js";
 const router = express.Router();
 
 // Check if User Email Exists
@@ -50,7 +51,23 @@ router.post(
 router.post(
   "/sendFriendRequest",
   tokenController.verifyLoggedInToken,
-  userController.sendFriendRequest,
+  friendRequestController.sendFriendRequest,
+  (req, res) => res.status(200).json(res.locals.result)
+);
+
+// Fetch Friend Requests
+router.get(
+  "/fetchFriendRequests",
+  tokenController.verifyLoggedInToken,
+  friendRequestController.fetchFriendRequests,
+  (req, res) => res.status(200).json(res.locals.result)
+);
+
+// Friend Request Actions
+router.post(
+  "/friendRequestAction",
+  tokenController.verifyLoggedInToken,
+  friendRequestController.friendRequestAction,
   (req, res) => res.status(200).json(res.locals.result)
 );
 

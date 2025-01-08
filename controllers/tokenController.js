@@ -114,4 +114,19 @@ tokenController.verifyLoggedInToken = async (req, res, next) => {
   }
 };
 
+/* logout */
+tokenController.logout = async (req, res, next) => {
+  try {
+    res.clearCookie("just.in.chat.user");
+    res.locals.result = { success: true };
+    return next();
+  } catch (err) {
+    return next({
+      log: `userController.logout error: ${err}`,
+      status: 500,
+      message: { error: "Error occurred in userController.logout." },
+    });
+  }
+};
+
 export default tokenController;

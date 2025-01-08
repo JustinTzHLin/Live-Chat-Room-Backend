@@ -2,7 +2,6 @@ import bcrypt from "bcrypt";
 import transporter from "../configs/mail.js";
 import jwt from "jsonwebtoken";
 import User from "../models/usersModel.js";
-import FriendRequest from "../models/friendRequestsModel.js";
 const SALT_WORK_FACTOR = 10;
 const userController = {};
 
@@ -30,7 +29,6 @@ userController.sendRegistrationEmail = async (req, res, next) => {
   const { JWT_SECRET, FRONTEND_URL, SMTP_EMAIL } = process.env;
   const useremail = req.body.email;
   const token = jwt.sign({ useremail }, JWT_SECRET, { expiresIn: "1h" });
-  console.log(useremail);
   const mailOptions = {
     from: SMTP_EMAIL,
     to: useremail,
@@ -77,7 +75,6 @@ userController.createUser = async (req, res, next) => {
       password: hashedPassword,
     });
     const authenticatedUser = await user.save();
-    console.log(authenticatedUser);
     res.locals.result.userCreated = true;
     res.locals.result.authenticatedUser = authenticatedUser;
     return next();
@@ -108,7 +105,6 @@ userController.verifyUser = async (req, res, next) => {
       );
       res.locals.result.userVerified = true;
       res.locals.result.authenticatedUser = authenticatedUser;
-      console.log(authenticatedUser);
       return next();
     } else {
       res.locals.result.userVerified = false;
@@ -149,39 +145,6 @@ userController.searchUser = async (req, res, next) => {
       status: 500,
       message: {
         error: "Error occurred in userController.searchUser.",
-      },
-    });
-  }
-};
-
-/* send friend request */
-userController.sendFriendRequest = async (req, res, next) => {
-  if (!res.locals.result.tokenVerified) return next();
-  const { senderId, receiverId } = req.body;
-  try {
-    const searchFriendRequest = await FriendRequest.findOne({
-      senderId,
-      receiverId,
-    });
-    if (searchFriendRequest) {
-      res.locals.result = {
-        friendRequestSent: false,
-        message: "Request already sent.",
-      };
-      return next();
-    }
-    const friendRequest = await FriendRequest.create({
-      senderId,
-      receiverId,
-    });
-    if (friendRequest) res.locals.result = { friendRequestSent: true };
-    return next();
-  } catch (err) {
-    return next({
-      log: `userController.sendFriendRequest error: ${err}`,
-      status: 500,
-      message: {
-        error: "Error occurred in userController.sendFriendRequest.",
       },
     });
   }
