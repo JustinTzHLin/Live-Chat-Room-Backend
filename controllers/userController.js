@@ -193,5 +193,35 @@ userController.changePassword = async (req, res, next) => {
   }
 };
 
+// change username
+userController.updateUsername = async (req, res, next) => {
+  if (!res.locals.result.tokenVerified) {
+    res.locals.skipIssueToken = true;
+    return next();
+  }
+  const { userId } = res.locals.result.user;
+  const { newUsername } = req.body;
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { username: newUsername },
+      { new: true }
+    );
+    res.locals.result = {
+      usernameChanged: true,
+      authenticatedUser: updatedUser,
+    };
+    return next();
+  } catch (err) {
+    return next({
+      log: `userController.updateUsername error: ${err}`,
+      status: 500,
+      message: {
+        error: "Error occurred in userController.updateUsername.",
+      },
+    });
+  }
+};
+
 // Export
 export default userController;

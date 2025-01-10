@@ -80,4 +80,13 @@ router.post(
   (req, res) => res.status(200).json(res.locals.result)
 );
 
+// Change Username
+router.post(
+  "/updateUsername",
+  tokenController.verifyLoggedInToken,
+  userController.updateUsername,
+  tokenController.issueToken,
+  (req, res) => res.status(200).json(res.locals.result)
+);
+
 export default router;
