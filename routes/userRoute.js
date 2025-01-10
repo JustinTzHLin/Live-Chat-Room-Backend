@@ -71,4 +71,13 @@ router.post(
   (req, res) => res.status(200).json(res.locals.result)
 );
 
+// Change Password
+router.post(
+  "/changePassword",
+  tokenController.verifyLoggedInToken,
+  userController.changePassword,
+  tokenController.issueToken,
+  (req, res) => res.status(200).json(res.locals.result)
+);
+
 export default router;

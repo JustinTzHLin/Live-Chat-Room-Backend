@@ -150,5 +150,48 @@ userController.searchUser = async (req, res, next) => {
   }
 };
 
+/* change password */
+userController.changePassword = async (req, res, next) => {
+  if (!res.locals.result.tokenVerified) {
+    res.locals.skipIssueToken = true;
+    return next();
+  }
+  const { userId } = res.locals.result.user;
+  const { oldPassword, newPassword } = req.body;
+  try {
+    const user = await User.findById(userId);
+    const isPasswordValid = await bcrypt.compare(oldPassword, user.password);
+    if (isPasswordValid) {
+      const salt = await bcrypt.genSalt(SALT_WORK_FACTOR);
+      const hashedPassword = await bcrypt.hash(newPassword, salt);
+      const updatedUser = await User.findByIdAndUpdate(
+        userId,
+        { password: hashedPassword },
+        { new: true }
+      );
+      res.locals.result = {
+        passwordChanged: true,
+        authenticatedUser: updatedUser,
+      };
+      return next();
+    } else {
+      res.locals.result = {
+        passwordChanged: false,
+        errorMessage: "incorrect password",
+      };
+      res.locals.skipIssueToken = true;
+      return next();
+    }
+  } catch (err) {
+    return next({
+      log: `userController.changePassword error: ${err}`,
+      status: 500,
+      message: {
+        error: "Error occurred in userController.changePassword.",
+      },
+    });
+  }
+};
+
 // Export
 export default userController;

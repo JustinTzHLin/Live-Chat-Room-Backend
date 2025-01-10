@@ -18,7 +18,7 @@ friendRequestController.sendFriendRequest = async (req, res, next) => {
       if (searchFriendRequest.status === "pending") {
         res.locals.result = {
           friendRequestSent: false,
-          message: "Request already sent.",
+          errorMessage: "request already sent",
         };
         return next();
       } else if (

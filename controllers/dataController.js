@@ -24,7 +24,7 @@ dataController.fetchUserFriends = async (req, res, next) => {
       }
       return next();
     } else {
-      res.locals.result = { success: false, errorMessage: "User not found." };
+      res.locals.result = { success: false, errorMessage: "user not found" };
       res.locals.skipfetchUserChats = true;
       return next();
     }
