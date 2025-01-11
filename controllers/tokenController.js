@@ -46,10 +46,10 @@ tokenController.issueToken = async (req, res, next) => {
   if (res.locals.skipIssueToken) return next();
   try {
     // issue token with user data
-    const { id, username, email, createdAt, lastActive } =
+    const { id, username, email, twoFactor, createdAt, lastActive } =
       res.locals.result.authenticatedUser;
     const loggedInToken = jwt.sign(
-      { userId: id, username, email, createdAt, lastActive },
+      { userId: id, username, email, twoFactor, createdAt, lastActive },
       JWT_SECRET,
       { expiresIn: "1h" }
     );
