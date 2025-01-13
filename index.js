@@ -20,7 +20,6 @@ import chatRoute from "./routes/chatRoute.js";
 const PORT = 8000;
 const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
 const expressServer = express();
-console.log(FRONTEND_URL);
 
 // CORS Middleware
 const corsOptions = {
@@ -98,23 +97,10 @@ mongoose
   });
 
 // Routes
-expressServer.get("/testMongoDB", async (req, res) => {
-  console.log("testMongoDB");
-  try {
-    const data = await User.findOne({ name: "Justin" });
-    console.log(data);
-    res.status(200).json(data);
-  } catch (error) {
-    console.log(error);
-  }
-});
-
-// Routes
 expressServer.use("/user", userRoute);
 expressServer.use("/token", tokenRoute);
 expressServer.use("/chat", chatRoute);
 
-// Test
 expressServer.get("/", (req, res) => res.send("Hello World"));
 expressServer.get("*", (req, res, next) =>
   next({

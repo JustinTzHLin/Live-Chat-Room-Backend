@@ -28,6 +28,7 @@ router.post(
   userController.checkUserEmailExists,
   userController.verifyUser,
   tokenController.issueToken,
+  userController.sendLoginOTPEmail,
   (req, res) => res.status(200).json(res.locals.result)
 );
 
@@ -85,6 +86,14 @@ router.post(
   "/updateUsername",
   tokenController.verifyLoggedInToken,
   userController.updateUsername,
+  tokenController.issueToken,
+  (req, res) => res.status(200).json(res.locals.result)
+);
+
+// Verify OTP Code
+router.post(
+  "/verifyOTPCode",
+  tokenController.verifyOTPCode,
   tokenController.issueToken,
   (req, res) => res.status(200).json(res.locals.result)
 );

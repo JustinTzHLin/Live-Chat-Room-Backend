@@ -33,7 +33,6 @@ userController.sendRegistrationEmail = async (req, res, next) => {
     from: SMTP_EMAIL,
     to: useremail,
     subject: "Welcome to Just In Chat!",
-    text: "Thank you for signing up!",
     html:
       "<h1>Welcome to Just In Chat!</h1>" +
       "<p>We're thrilled to have you join our community of chat enthusiasts and instant communicators!</p>" +
@@ -105,6 +104,8 @@ userController.verifyUser = async (req, res, next) => {
       );
       res.locals.result.userVerified = true;
       res.locals.result.authenticatedUser = authenticatedUser;
+      if (res.locals.result.authenticatedUser.twoFactor !== "none")
+        res.locals.generateOtp = true;
       return next();
     } else {
       res.locals.result.userVerified = false;
@@ -218,6 +219,56 @@ userController.updateUsername = async (req, res, next) => {
       status: 500,
       message: {
         error: "Error occurred in userController.updateUsername.",
+      },
+    });
+  }
+};
+
+/* send login otp email */
+userController.sendLoginOTPEmail = async (req, res, next) => {
+  if (res.locals.result.authenticatedUser.twoFactor === "none") return next();
+  const { SMTP_EMAIL } = process.env;
+  const useremail = res.locals.result.authenticatedUser.email;
+  const otpCode = res.locals.otpCode;
+  const mailOptions = {
+    from: SMTP_EMAIL,
+    to: useremail,
+    subject: "Your Just In Chat OTP Code",
+    html: `
+      <div style="font-family: Arial, sans-serif; line-height: 1.5; color: #333;">
+        <h2 style="color: black;">Just In Chat</h2>
+        <p>Hi there,</p>
+        <p>Use the OTP code below to sign in to your account:</p>
+        <div style="text-align: center; margin: 20px 0;">
+          <span style="
+            display: inline-block;
+            font-size: 32px;
+            font-weight: bold;
+            color: white;
+            background: black;
+            padding: 10px 20px;
+            border-radius: 5px;
+          ">
+            ${otpCode}
+          </span>
+        </div>
+        <p>If you did not request this code, please ignore this email.</p>
+        <p>Thanks,</p>
+        <p>The Just In Chat Team</p>
+      </div>
+    `,
+  };
+  try {
+    await transporter.verify();
+    await transporter.sendMail(mailOptions);
+    res.locals.result.emailSent = true;
+    return next();
+  } catch (err) {
+    return next({
+      log: `userController.sendRegistrationEmail error: ${err}`,
+      status: 500,
+      message: {
+        error: "Error occurred in userController.sendRegistrationEmail.",
       },
     });
   }

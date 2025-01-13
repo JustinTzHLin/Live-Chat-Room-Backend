@@ -13,7 +13,7 @@ tokenController.verifyParamToken = async (req, res, next) => {
     res.locals.result = { tokenVerified: true, useremail };
     return next();
   } catch (err) {
-    console.log(err.message);
+    console.log(err);
     // handle jwt errors
     switch (err.message) {
       case "jwt malformed":
@@ -46,20 +46,38 @@ tokenController.issueToken = async (req, res, next) => {
   if (res.locals.skipIssueToken) return next();
   try {
     // issue token with user data
-    const { id, username, email, twoFactor, createdAt, lastActive } =
+    const { id, userId, username, email, twoFactor, createdAt, lastActive } =
       res.locals.result.authenticatedUser;
+    const generateOtp = res.locals.generateOtp || false;
+    const otpCode = Math.floor(Math.random() * 1000000)
+      .toString()
+      .padStart(6, "0");
     const loggedInToken = jwt.sign(
-      { userId: id, username, email, twoFactor, createdAt, lastActive },
+      {
+        userId: id || userId,
+        username,
+        email,
+        twoFactor,
+        createdAt,
+        lastActive,
+        ...(generateOtp && { otpCode }),
+      },
       JWT_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: generateOtp ? "10m" : "1h" }
     );
     // Store the token in HTTP-only cookie
-    res.cookie("just.in.chat.user", loggedInToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
-      maxAge: 60 * 60 * 1000,
-    });
+    res.cookie(
+      generateOtp ? "just.in.chat.2fa" : "just.in.chat.user",
+      loggedInToken,
+      {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+        maxAge: generateOtp ? 10 * 60 * 1000 : 60 * 60 * 1000,
+      }
+    );
+    res.locals.otpCode = otpCode;
+    return next();
   } catch (err) {
     return next({
       log: `userController.issueToken error: ${err}`,
@@ -67,7 +85,6 @@ tokenController.issueToken = async (req, res, next) => {
       message: { error: "Error occurred in userController.issueToken." },
     });
   }
-  return next();
 };
 
 /* verify token for logged in */
@@ -87,7 +104,7 @@ tokenController.verifyLoggedInToken = async (req, res, next) => {
     res.locals.result = { tokenVerified: true, user: decoded };
     return next();
   } catch (err) {
-    console.log(err.message);
+    console.log(err);
     // handle jwt errors
     switch (err.message) {
       case "jwt malformed":
@@ -108,6 +125,64 @@ tokenController.verifyLoggedInToken = async (req, res, next) => {
           status: 500,
           message: {
             error: "Error occurred in userController.verifyLoggedInToken.",
+          },
+        });
+    }
+  }
+};
+
+/* verify login otp */
+tokenController.verifyOTPCode = async (req, res, next) => {
+  const { otp } = req.body;
+  // check if token exists
+  const otpToken = req.cookies["just.in.chat.2fa"];
+  if (!otpToken) {
+    res.locals.result = {
+      otpVerified: false,
+      errorMessage: "no token found",
+    };
+    return next();
+  }
+  try {
+    // verify login otp
+    const decoded = jwt.verify(otpToken, JWT_SECRET);
+    if (decoded.otpCode === otp) {
+      res.locals.result = {
+        otpVerified: true,
+        authenticatedUser: decoded,
+      };
+      res.clearCookie("just.in.chat.2fa");
+    } else {
+      res.locals.skipIssueToken = true;
+      res.locals.result = {
+        otpVerified: false,
+        errorMessage: "incorrect otp code",
+      };
+    }
+    return next();
+  } catch (err) {
+    console.log(err);
+    res.locals.skipIssueToken = true;
+    // handle jwt errors
+    switch (err.message) {
+      case "jwt malformed":
+        res.locals.result = {
+          tokenVerified: false,
+          errorMessage: "jwt malformed",
+        };
+        return next();
+      case "jwt expired":
+        res.locals.result = {
+          tokenVerified: false,
+          errorMessage: "jwt expired",
+        };
+        return next();
+      default:
+        return next({
+          log: `userController.verifyOTPCode error: ${err}`,
+          status: 500,
+          message: {
+            error: "Error occurred in userController.verifyOTPCode.",
           },
         });
     }
