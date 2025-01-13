@@ -274,5 +274,34 @@ userController.sendLoginOTPEmail = async (req, res, next) => {
   }
 };
 
+userController.change2FA = async (req, res, next) => {
+  if (!res.locals.result.tokenVerified) {
+    res.locals.skipIssueToken = true;
+    return next();
+  }
+  const { userId } = res.locals.result.user;
+  const { twoFactor } = req.body;
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { twoFactor },
+      { new: true }
+    );
+    res.locals.result = {
+      twoFactorChanged: true,
+      authenticatedUser: updatedUser,
+    };
+    return next();
+  } catch (err) {
+    return next({
+      log: `userController.change2FA error: ${err}`,
+      status: 500,
+      message: {
+        error: "Error occurred in userController.change2FA.",
+      },
+    });
+  }
+};
+
 // Export
 export default userController;

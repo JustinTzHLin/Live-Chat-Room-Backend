@@ -98,4 +98,13 @@ router.post(
   (req, res) => res.status(200).json(res.locals.result)
 );
 
+// Change 2FA Setting
+router.post(
+  "/change2FA",
+  tokenController.verifyLoggedInToken,
+  userController.change2FA,
+  tokenController.issueToken,
+  (req, res) => res.status(200).json(res.locals.result)
+);
+
 export default router;
