@@ -43,7 +43,10 @@ tokenController.verifyParamToken = async (req, res, next) => {
 /* issue token after authentication */
 tokenController.issueToken = async (req, res, next) => {
   // skip issue token under certain conditions
-  if (res.locals.skipIssueToken) return next();
+  if (res.locals.skipIssueToken) {
+    res.locals.skipSendOTPEmail = true;
+    return next();
+  }
   try {
     // issue token with user data
     const { id, userId, username, email, twoFactor, createdAt, lastActive } =

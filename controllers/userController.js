@@ -226,7 +226,11 @@ userController.updateUsername = async (req, res, next) => {
 
 /* send login otp email */
 userController.sendLoginOTPEmail = async (req, res, next) => {
-  if (res.locals.result.authenticatedUser.twoFactor === "none") return next();
+  if (
+    res.locals.skipSendOTPEmail ||
+    res.locals.result.authenticatedUser.twoFactor === "none"
+  )
+    return next();
   const { SMTP_EMAIL } = process.env;
   const useremail = res.locals.result.authenticatedUser.email;
   const otpCode = res.locals.otpCode;
