@@ -49,8 +49,16 @@ tokenController.issueToken = async (req, res, next) => {
   }
   try {
     // issue token with user data
-    const { id, userId, username, email, twoFactor, createdAt, lastActive } =
-      res.locals.result.authenticatedUser;
+    const {
+      id,
+      userId,
+      username,
+      email,
+      jicId,
+      twoFactor,
+      createdAt,
+      lastActive,
+    } = res.locals.result.authenticatedUser;
     const generateOtp = res.locals.generateOtp || false;
     const otpCode = Math.floor(Math.random() * 1000000)
       .toString()
@@ -63,6 +71,7 @@ tokenController.issueToken = async (req, res, next) => {
         twoFactor,
         createdAt,
         lastActive,
+        jicId,
         ...(generateOtp && { otpCode }),
       },
       JWT_SECRET,

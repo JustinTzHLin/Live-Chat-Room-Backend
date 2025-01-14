@@ -128,7 +128,7 @@ userController.searchUser = async (req, res, next) => {
   try {
     let user;
     if (email) user = await User.findOne({ email });
-    else if (jicId) user = await User.findOne({ jicID: jicId });
+    else if (jicId) user = await User.findOne({ jicId });
     if (user)
       res.locals.result = {
         userExists: true,
@@ -210,6 +210,36 @@ userController.updateUsername = async (req, res, next) => {
     );
     res.locals.result = {
       usernameChanged: true,
+      authenticatedUser: updatedUser,
+    };
+    return next();
+  } catch (err) {
+    return next({
+      log: `userController.updateUsername error: ${err}`,
+      status: 500,
+      message: {
+        error: "Error occurred in userController.updateUsername.",
+      },
+    });
+  }
+};
+
+// change JIC Id
+userController.updateJicId = async (req, res, next) => {
+  if (!res.locals.result.tokenVerified) {
+    res.locals.skipIssueToken = true;
+    return next();
+  }
+  const { userId } = res.locals.result.user;
+  const { newJicId } = req.body;
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { jicId: newJicId },
+      { new: true }
+    );
+    res.locals.result = {
+      jicIdChanged: true,
       authenticatedUser: updatedUser,
     };
     return next();

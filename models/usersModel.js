@@ -5,7 +5,7 @@ const userSchema = new Schema({
   username: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: String,
-  jicID: { type: String, unique: true },
+  jicId: { type: String, unique: true, default: null },
   authProvider: { type: String, default: "email" }, // email, google
   contacts: { type: [Schema.Types.ObjectId], default: [] },
   twoFactor: { type: String, default: "none" }, // none, email

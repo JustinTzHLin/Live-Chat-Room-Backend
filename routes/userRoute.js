@@ -90,6 +90,15 @@ router.post(
   (req, res) => res.status(200).json(res.locals.result)
 );
 
+// Change JIC ID
+router.post(
+  "/updateJicId",
+  tokenController.verifyLoggedInToken,
+  userController.updateJicId,
+  tokenController.issueToken,
+  (req, res) => res.status(200).json(res.locals.result)
+);
+
 // Verify OTP Code
 router.post(
   "/verifyOTPCode",
