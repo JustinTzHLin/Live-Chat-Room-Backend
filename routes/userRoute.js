@@ -116,4 +116,13 @@ router.post(
   (req, res) => res.status(200).json(res.locals.result)
 );
 
+// Create New Group
+router.post(
+  "/createGroup",
+  tokenController.verifyLoggedInToken,
+  userController.createGroup,
+  tokenController.issueToken,
+  (req, res) => res.status(200).json(res.locals.result)
+);
+
 export default router;

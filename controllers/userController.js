@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import transporter from "../configs/mail.js";
 import jwt from "jsonwebtoken";
 import User from "../models/usersModel.js";
+import Conversation from "../models/conversationsModel.js";
 const SALT_WORK_FACTOR = 10;
 const userController = {};
 
@@ -332,6 +333,33 @@ userController.change2FA = async (req, res, next) => {
       status: 500,
       message: {
         error: "Error occurred in userController.change2FA.",
+      },
+    });
+  }
+};
+
+// create new group
+userController.createGroup = async (req, res, next) => {
+  if (!res.locals.result.tokenVerified) {
+    res.locals.skipIssueToken = true;
+    return next();
+  }
+  const { newGroup } = req.body;
+  try {
+    const group = new Conversation(newGroup);
+    const createdGroup = await group.save();
+    res.locals.result = {
+      groupCreated: true,
+      createdGroup,
+      authenticatedUser: res.locals.result.user,
+    };
+    return next();
+  } catch (err) {
+    return next({
+      log: `userController.createGroup error: ${err}`,
+      status: 500,
+      message: {
+        error: "Error occurred in userController.createGroup.",
       },
     });
   }
