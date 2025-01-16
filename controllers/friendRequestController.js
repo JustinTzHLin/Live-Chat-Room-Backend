@@ -94,8 +94,11 @@ friendRequestController.fetchFriendRequests = async (req, res, next) => {
       });
     }
     res.locals.result = {
-      sent,
-      received,
+      friendRequestsFetched: true,
+      friendRequests: {
+        sent,
+        received,
+      },
     };
     return next();
   } catch (err) {
