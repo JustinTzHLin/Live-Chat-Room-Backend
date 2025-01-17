@@ -45,38 +45,51 @@ const io = new Server(server, {
 
 // Socket.io Events
 io.on("connection", (socket) => {
-  console.log("Client connected");
+  console.log(`Client connected: ${socket.id}`);
+
+  // Handle user join conversation room
+  socket.on("join_room", (conversationId) => {
+    console.log("User joined conversation room:", conversationId);
+    socket.join(conversationId);
+  });
 
   // Handle messages from the client
   socket.on("send_message", (message) => {
     console.log("Message received:", message);
-
-    // Send message to all clients, including the sender
-    io.emit("receive_message", message);
+    io.to(message.conversationId).emit("receive_message", message);
   });
 
   // Handle sent friend request
   socket.on("send_friend_request", (friendRequest) => {
     console.log("Friend request received:", friendRequest);
-
-    // Send friend request to all clients, including the sender
-    io.emit("receive_friend_request", friendRequest);
+    const senderId = friendRequest.sender.senderId;
+    const receiverId = friendRequest.receiver.receiverId;
+    io.to(senderId).emit("receive_friend_request", friendRequest);
+    io.to(receiverId).emit("receive_friend_request", friendRequest);
   });
 
   // Handle rejected or canceld friend request
   socket.on("cancel_reject_friend_request", (friendRequest) => {
+    const { senderId, receiverId } = friendRequest;
     console.log("Friend request canceled or rejected:", friendRequest);
-
-    // Cancel or reject friend request from all clients, including the canceler or rejecter
-    io.emit("canceled_rejected_friend_request", friendRequest);
+    io.to(senderId).emit("canceled_rejected_friend_request", friendRequest);
+    io.to(receiverId).emit("canceled_rejected_friend_request", friendRequest);
   });
 
   // Handle accepted friend request
   socket.on("accept_friend_request", (friendRequest) => {
     console.log("Friend request accepted:", friendRequest);
+    const { senderId, receiverId } = friendRequest;
+    io.to(senderId).emit("accepted_friend_request", friendRequest);
+    io.to(receiverId).emit("accepted_friend_request", friendRequest);
+  });
 
-    // Accept friend request from all clients, including the accepter
-    io.emit("accepted_friend_request", friendRequest);
+  // Handle created group
+  socket.on("create_group", (group) => {
+    console.log("Group created:", group);
+    for (const participantId of group.participantIDs) {
+      io.to(participantId).emit("group_created", group);
+    }
   });
 
   // Handle disconnections
