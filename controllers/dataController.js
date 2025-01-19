@@ -46,6 +46,7 @@ dataController.fetchUserChats = async (req, res, next) => {
       participantIDs: userObjectId,
     });
     res.locals.result.conversations = {};
+    const tempUsers = {};
     for (const conversation of conversations) {
       res.locals.result.conversations[conversation._id] = {
         type: conversation.type,
@@ -56,13 +57,21 @@ dataController.fetchUserChats = async (req, res, next) => {
       };
       const messages = await Message.find({ conversationId: conversation._id });
       for (const message of messages) {
+        let senderName = "";
+        if (message.senderId in tempUsers) {
+          senderName = tempUsers[message.senderId];
+        } else {
+          const user = await User.findById(message.senderId);
+          senderName = user.username;
+          tempUsers[message.senderId] = user.username;
+        }
         res.locals.result.conversations[message.conversationId].messages.push({
           senderId: message.senderId,
+          senderName,
           content: message.content,
           timestamp: message.timestamp,
           readBy: message.readBy,
           status: message.status,
-          // isTransient: message.isTransient,
           conversationId: message.conversationId,
         });
       }
