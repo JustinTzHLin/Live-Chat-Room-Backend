@@ -9,6 +9,7 @@ const userSchema = new Schema({
   authProvider: { type: String, default: "email" }, // email, google
   contacts: { type: [Schema.Types.ObjectId], default: [] },
   twoFactor: { type: String, default: "none" }, // none, email
+  theme: { type: String, default: "system" }, // system, light, dark
   createdAt: { type: Date, default: Date.now },
   lastActive: { type: Date, default: Date.now },
 });

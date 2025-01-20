@@ -56,6 +56,7 @@ tokenController.issueToken = async (req, res, next) => {
       email,
       jicId,
       twoFactor,
+      theme,
       createdAt,
       lastActive,
     } = res.locals.result.authenticatedUser;
@@ -69,6 +70,7 @@ tokenController.issueToken = async (req, res, next) => {
         username,
         email,
         twoFactor,
+        theme,
         createdAt,
         lastActive,
         jicId,
