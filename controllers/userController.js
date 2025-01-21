@@ -365,5 +365,35 @@ userController.createGroup = async (req, res, next) => {
   }
 };
 
+// change theme setting
+userController.changeTheme = async (req, res, next) => {
+  if (!res.locals.result.tokenVerified) {
+    res.locals.skipIssueToken = true;
+    return next();
+  }
+  const { userId } = res.locals.result.user;
+  const { theme } = req.body;
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { theme },
+      { new: true }
+    );
+    res.locals.result = {
+      themeChanged: true,
+      authenticatedUser: updatedUser,
+    };
+    return next();
+  } catch (err) {
+    return next({
+      log: `userController.changeTheme error: ${err}`,
+      status: 500,
+      message: {
+        error: "Error occurred in userController.changeTheme.",
+      },
+    });
+  }
+};
+
 // Export
 export default userController;

@@ -125,4 +125,13 @@ router.post(
   (req, res) => res.status(200).json(res.locals.result)
 );
 
+// Change Theme Setting
+router.post(
+  "/changeTheme",
+  tokenController.verifyLoggedInToken,
+  userController.changeTheme,
+  tokenController.issueToken,
+  (req, res) => res.status(200).json(res.locals.result)
+);
+
 export default router;
