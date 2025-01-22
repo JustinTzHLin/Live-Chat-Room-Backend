@@ -10,6 +10,7 @@ const userSchema = new Schema({
   contacts: { type: [Schema.Types.ObjectId], default: [] },
   twoFactor: { type: String, default: "none" }, // none, email
   theme: { type: String, default: "system" }, // system, light, dark
+  timeZone: { type: String, default: null },
   createdAt: { type: Date, default: Date.now },
   lastActive: { type: Date, default: Date.now },
 });

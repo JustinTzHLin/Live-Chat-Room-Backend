@@ -134,4 +134,13 @@ router.post(
   (req, res) => res.status(200).json(res.locals.result)
 );
 
+// Change Timezone Setting
+router.post(
+  "/changeTimeZone",
+  tokenController.verifyLoggedInToken,
+  userController.changeTimeZone,
+  tokenController.issueToken,
+  (req, res) => res.status(200).json(res.locals.result)
+);
+
 export default router;

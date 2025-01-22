@@ -395,5 +395,35 @@ userController.changeTheme = async (req, res, next) => {
   }
 };
 
+// change time zone setting
+userController.changeTimeZone = async (req, res, next) => {
+  if (!res.locals.result.tokenVerified) {
+    res.locals.skipIssueToken = true;
+    return next();
+  }
+  const { userId } = res.locals.result.user;
+  const { timeZone } = req.body;
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { timeZone },
+      { new: true }
+    );
+    res.locals.result = {
+      timeZoneChanged: true,
+      authenticatedUser: updatedUser,
+    };
+    return next();
+  } catch (err) {
+    return next({
+      log: `userController.changeTimeZone error: ${err}`,
+      status: 500,
+      message: {
+        error: "Error occurred in userController.changeTimeZone.",
+      },
+    });
+  }
+};
+
 // Export
 export default userController;
