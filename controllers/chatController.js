@@ -5,13 +5,14 @@ const chatController = {};
 
 chatController.sendMessage = async (req, res, next) => {
   if (!res.locals.result.tokenVerified) return next();
-  const { senderId, conversationId, content } = req.body;
+  const { senderId, conversationId, content, timestamp } = req.body;
   try {
     const newMessage = await Message.create({
       senderId: mongoose.Types.ObjectId.createFromHexString(senderId),
       conversationId:
         mongoose.Types.ObjectId.createFromHexString(conversationId),
       content,
+      timestamp,
     });
     res.locals.result = { success: true, newMessage };
     return next();

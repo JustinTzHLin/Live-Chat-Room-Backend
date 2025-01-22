@@ -56,7 +56,7 @@ io.on("connection", (socket) => {
   // Handle messages from the client
   socket.on("send_message", (message) => {
     console.log("Message received:", message);
-    io.to(message.conversationId).emit("receive_message", message);
+    socket.to(message.conversationId).emit("receive_message", message);
   });
 
   // Handle sent friend request
