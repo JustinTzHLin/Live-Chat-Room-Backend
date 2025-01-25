@@ -92,6 +92,18 @@ io.on("connection", (socket) => {
     }
   });
 
+  // Handle webrtc signal
+  // socket.on("webrtc_signal", (signal) => {
+  //   console.log("WebRTC signal received:", signal);
+  //   const { senderId, receiverId } = signal;
+  //   io.to(senderId).emit("webrtc_signal", signal);
+  //   io.to(receiverId).emit("webrtc_signal", signal);
+  // });
+  socket.on("webrtc_call", (data) => {
+    console.log("WebRTC signal received:", data);
+    socket.broadcast.emit("test_webrtc", data);
+  });
+
   // Handle disconnections
   socket.on("disconnect", () => {
     console.log("Client disconnected");
