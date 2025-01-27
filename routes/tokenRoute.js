@@ -18,4 +18,12 @@ router.get("/logout", tokenController.logout, (req, res) =>
   res.status(200).json(res.locals.result)
 );
 
+router.post(
+  "/issueCallerInfoToken",
+  tokenController.verifyLoggedInToken,
+  tokenController.issueCallerInfoToken,
+  tokenController.issueToken,
+  (req, res) => res.status(200).json(res.locals.result)
+);
+
 export default router;

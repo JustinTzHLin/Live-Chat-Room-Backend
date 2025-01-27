@@ -4,13 +4,13 @@ const tokenController = {};
 
 /* verify token for registration */
 tokenController.verifyParamToken = async (req, res, next) => {
-  // check if token exists
-  const { registerToken } = req.body;
-  if (!registerToken) throw new Error("A token is required for registration.");
   try {
+    // check if token exists
+    const { token } = req.body;
+    if (!token) throw new Error("A token is required for registration.");
     // verify registration token
-    const { useremail } = jwt.verify(registerToken, JWT_SECRET);
-    res.locals.result = { tokenVerified: true, useremail };
+    const decoded = jwt.verify(token, JWT_SECRET);
+    res.locals.result = { tokenVerified: true, decoded };
     return next();
   } catch (err) {
     console.log(err);
@@ -153,6 +153,7 @@ tokenController.verifyOTPCode = async (req, res, next) => {
   // check if token exists
   const otpToken = req.cookies["just.in.chat.2fa"];
   if (!otpToken) {
+    res.locals.skipIssueToken = true;
     res.locals.result = {
       otpVerified: false,
       errorMessage: "no token found",
@@ -202,6 +203,29 @@ tokenController.verifyOTPCode = async (req, res, next) => {
           },
         });
     }
+  }
+};
+
+/* issue token after authentication */
+tokenController.issueCallerInfoToken = async (req, res, next) => {
+  if (!res.locals.result.tokenVerified) {
+    res.locals.skipIssueToken = true;
+    return next();
+  }
+  try {
+    const callerInfoToken = jwt.sign(req.body, JWT_SECRET, { expiresIn: "5m" });
+    res.locals.result = {
+      generatedCallerInfoToken: true,
+      callerInfoToken,
+      authenticatedUser: res.locals.result.user,
+    };
+    return next();
+  } catch (err) {
+    return next({
+      log: `userController.issueToken error: ${err}`,
+      status: 500,
+      message: { error: "Error occurred in userController.issueToken." },
+    });
   }
 };
 
