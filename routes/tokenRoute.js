@@ -19,9 +19,9 @@ router.get("/logout", tokenController.logout, (req, res) =>
 );
 
 router.post(
-  "/issueCallerInfoToken",
+  "/issueCallersInfoToken",
   tokenController.verifyLoggedInToken,
-  tokenController.issueCallerInfoToken,
+  tokenController.issueCallersInfoToken,
   tokenController.issueToken,
   (req, res) => res.status(200).json(res.locals.result)
 );

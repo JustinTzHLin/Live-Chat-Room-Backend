@@ -47,10 +47,10 @@ const io = new Server(server, {
 io.on("connection", (socket) => {
   console.log(`Client connected: ${socket.id}`);
 
-  // Handle user join conversation room
-  socket.on("join_room", (conversationId) => {
-    console.log("User joined conversation room:", conversationId);
-    socket.join(conversationId);
+  // Handle user join room
+  socket.on("join_room", (roomId) => {
+    console.log(`User: ${socket.id} joined room: ${roomId}`);
+    socket.join(roomId);
   });
 
   // Handle messages from the client
@@ -95,7 +95,7 @@ io.on("connection", (socket) => {
   // Handle webrtc signal
   socket.on("webrtc_call", (data) => {
     console.log("WebRTC signal received:", data);
-    socket.to(data.callersInfo.callee.id).emit("webrtc_call", data);
+    socket.to(data.callingId).emit("webrtc_call", data);
   });
 
   // Handle disconnections

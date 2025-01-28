@@ -207,16 +207,18 @@ tokenController.verifyOTPCode = async (req, res, next) => {
 };
 
 /* issue token after authentication */
-tokenController.issueCallerInfoToken = async (req, res, next) => {
+tokenController.issueCallersInfoToken = async (req, res, next) => {
   if (!res.locals.result.tokenVerified) {
     res.locals.skipIssueToken = true;
     return next();
   }
   try {
-    const callerInfoToken = jwt.sign(req.body, JWT_SECRET, { expiresIn: "5m" });
+    const callersInfoToken = jwt.sign(req.body, JWT_SECRET, {
+      expiresIn: "5m",
+    });
     res.locals.result = {
-      generatedCallerInfoToken: true,
-      callerInfoToken,
+      generatedCallersInfoToken: true,
+      callersInfoToken,
       authenticatedUser: res.locals.result.user,
     };
     return next();
