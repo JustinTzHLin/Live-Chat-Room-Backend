@@ -98,6 +98,12 @@ io.on("connection", (socket) => {
     socket.to(data.callingId).emit("webrtc_call", data);
   });
 
+  // Handle call setting changes
+  socket.on("change_call_setting", (data) => {
+    console.log("Call setting changes received:", data);
+    socket.to(data.callingId).emit("change_call_setting", data);
+  });
+
   // Handle disconnections
   socket.on("disconnect", () => {
     console.log("Client disconnected");
